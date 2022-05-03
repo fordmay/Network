@@ -1,5 +1,66 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    TODO
+<h3>All Posts</h3>
+
+{% if user.is_authenticated %}
+<div class="card border rounded shadow-sm mb-2">
+    <div class="card-body ">
+        <form action="{% url 'index' %}" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <input class="btn btn-primary" type="submit" value="Post">
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% for post in posts %}
+<div class="card border rounded shadow-sm mb-2">
+    <div class="card-body">
+        <h5 class="card-title"><a class="text-dark" href="#">{{ post.owner.username }}</a></h5>
+        <button type="button" class="btn btn-link p-0">Edit</button>
+        <p class="card-text mb-0">{{ post.content }}</p>
+        <p class="card-text"><small class="text-muted">{{ post.time }}</small></p>
+        <button type="button" class="btn btn-lg bg-transparent p-0">
+            {% if post in user.post_like.all %}
+            &#10084;
+            {% else %}
+            &#129293;
+            {% endif %}
+            <span>{{ post.user_like.all.count }}</span>
+        </button>
+    </div>
+</div>
+{% empty %}
+<h5>...Empty...</h5>
+{% endfor %}
+
+<div class="pagination">
+    {% if posts.has_previous %}
+    <div class="page-item">
+        <a class="page-link" href="?page=1">&laquo; first</a>
+    </div>
+    <div class="page-item">
+        <a class="page-link" href="?page={{ posts.previous_page_number }}">previous</a>
+    </div>
+    {% endif %}
+
+    <div class="page-item disabled">
+        <a class="page-link ">
+            Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+        </a>
+    </div>
+
+    {% if posts.has_next %}
+    <div class="page-item">
+        <a class="page-link" href="?page={{ posts.next_page_number }}">next</a>
+    </div>
+    <div class="page-item">
+        <a class="page-link" href="?page={{ posts.paginator.num_pages }}">last &raquo;</a>
+    </div>
+    {% endif %}
+</div>
+
+
 {% endblock %}

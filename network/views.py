@@ -1,14 +1,36 @@
 from django.contrib.auth import authenticate, login, logout
+from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .forms import PostForm
+from .models import User, Post
 
 
 def index(request):
-    return render(request, "network/index.html")
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            content_form = form.save(commit=False)
+            content_form.owner = request.user
+            content_form.save()
+            return HttpResponseRedirect(reverse("index"))
+
+    return render(request, "network/index.html", {
+        'form': PostForm(),
+        'posts': pagination(request, Post.objects.order_by('time').reverse())
+    })
+
+
+def pagination(request, objects):
+    paginator = Paginator(objects, 10)  # Show 10 posts per page.
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return page_obj
 
 
 def login_view(request):

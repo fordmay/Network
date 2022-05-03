@@ -1,0 +1,11 @@
+.card {
+    max-width: 1200px;
+    background-color: aliceblue;
+}
+label, h3, h5 {
+    font-weight: bold;
+}
+
+body {
+    padding: 10px;
+}
