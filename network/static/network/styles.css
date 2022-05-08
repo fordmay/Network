@@ -1,7 +1,16 @@
-.card {
-    max-width: 1200px;
+.form, .user_info {
+    background-color: darkblue;
+    color: aliceblue;
+}
+
+.post {
     background-color: aliceblue;
 }
+
+.card {
+    max-width: 1200px;
+}
+
 label, h3, h5 {
     font-weight: bold;
 }

@@ -2,9 +2,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 from .forms import PostForm
 from .models import User, Post
@@ -65,6 +66,45 @@ def pagination(request, objects):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     return page_obj
+
+
+@csrf_exempt
+@login_required
+def change_post(request, post_id):
+    # Query for requested email
+    try:
+        post = Post.objects.get(pk=post_id)
+    except Post.DoesNotExist:
+        return HttpResponseNotFound(f"<h1>Post {post_id} not found</h1>")
+
+    if request.method == "PUT":
+        if post in request.user.post_like.all():
+            request.user.post_like.remove(post)
+        else:
+            request.user.post_like.add(post)
+        return HttpResponse(status=204)
+
+    elif request.method == "POST":
+        print(True)
+        # # Return email contents
+        # if request.method == "GET":
+        #     return JsonResponse(email.serialize())
+        #
+        # # Update whether email is read or should be archived
+        # elif request.method == "PUT":
+        #     data = json.loads(request.body)
+        #     if data.get("read") is not None:
+        #         email.read = data["read"]
+        #     if data.get("archived") is not None:
+        #         email.archived = data["archived"]
+        #     email.save()
+        #     return HttpResponse(status=204)
+        #
+        # # Email must be via GET or PUT
+    else:
+        return JsonResponse({
+            "error": "PUT or POST request required."
+        }, status=400)
 
 
 def login_view(request):
