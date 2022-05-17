@@ -49,7 +49,7 @@
         {% if post.owner == user %}
         <button type="button" class="edit btn btn-link p-0" id="edit{{ post.pk }}">Edit</button>
         {% endif %}
-        <p class="card-text mb-0">{{ post.content }}</p>
+        <p class="card-text mb-0" style="white-space:pre-line;">{{ post.content }}</p>
         <p class="card-text"><small class="text-muted">{{ post.time }}</small></p>
         <div class="like btn btn-lg bg-transparent p-0" id="like{{ post.pk }}">
             <span>{% if post in user.post_like.all %}&#10084;{% else %}&#129293;{% endif %}</span>

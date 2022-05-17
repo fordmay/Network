@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -85,26 +85,16 @@ def change_post(request, post_id):
         return HttpResponse(status=204)
 
     elif request.method == "POST":
-        print(True)
-        # # Return email contents
-        # if request.method == "GET":
-        #     return JsonResponse(email.serialize())
-        #
-        # # Update whether email is read or should be archived
-        # elif request.method == "PUT":
-        #     data = json.loads(request.body)
-        #     if data.get("read") is not None:
-        #         email.read = data["read"]
-        #     if data.get("archived") is not None:
-        #         email.archived = data["archived"]
-        #     email.save()
-        #     return HttpResponse(status=204)
-        #
-        # # Email must be via GET or PUT
+        if post.owner == request.user:
+            data = request.body.decode("utf-8") 
+            post.content = data
+            post.save()
+            return HttpResponse(status=204)
+        else:
+            return HttpResponse(status=400)
+
     else:
-        return JsonResponse({
-            "error": "PUT or POST request required."
-        }, status=400)
+        return HttpResponse(status=400)
 
 
 def login_view(request):
